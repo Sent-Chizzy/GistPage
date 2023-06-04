@@ -1,5 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using GistPage.Models;
+using GistPage.Utilities;
 using GistPage.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -32,10 +33,121 @@ namespace GistPage.Areas.Admin.Controllers
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 UserName = x.UserName,
+                Email = x.Email,
             }).ToList();
+
+
+            //asigning Roles
+            foreach(var user in vm)
+            {
+                var singleUser = await _userManager.FindByIdAsync(user.Id);
+                var role = await _userManager.GetRolesAsync(singleUser);
+                user.Role = role.FirstOrDefault();
+            }
             
             return View(vm);
         }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string id)
+        {
+            var existingUser = await _userManager.FindByIdAsync(id);
+            if(existingUser == null)
+            {
+                _notification.Error("User not found");
+                return View();
+            }
+            var vm = new ResetPasswordVM()
+            {
+                Id = existingUser.Id,   
+                UserName= existingUser.UserName,
+            };
+            return View(vm);
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordVM vm)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+            var existingUser = await _userManager.FindByIdAsync(vm.Id);
+            if(existingUser == null)
+            {
+                _notification.Error("User Not Found");
+                return View(vm);
+            }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
+            var result = await _userManager.ResetPasswordAsync(existingUser, token, vm.NewPassword);
+            if(result.Succeeded)
+            {
+                _notification.Success("Password Reset Successful");
+                return RedirectToAction(nameof(Index));
+            }
+            return View(vm);
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View(new RegisterVM());
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterVM vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(vm);    
+            }
+            var checkUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
+            if(checkUserByEmail!= null)
+            {
+                _notification.Error("Existing Email");
+                return View(vm);
+            }
+            var checkUserByUserName = await _userManager.FindByNameAsync(vm.UserName);
+            if(checkUserByUserName != null)
+            {
+                _notification.Error("Existing Username");
+                return View(vm);
+            }
+            var applicationUser = new ApplicationUser()
+            {
+                Email = vm.Email,
+                UserName = vm.UserName,
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+            };
+
+            var result = await _userManager.CreateAsync(applicationUser, vm.Password);
+            if(result.Succeeded)
+            {
+                if (vm.IsAdmin)
+                {
+                    await _userManager.AddToRoleAsync(applicationUser, WebsitesRoles.WebsiteAdmin);
+                }
+                else
+                {
+                    await _userManager.AddToRoleAsync(applicationUser, WebsitesRoles.WebsiteAuthor);
+                }
+                _notification.Success("User Registration Completed");
+                return RedirectToAction("Index", "User", new { area = "Admin" });
+            }
+
+            return View(vm);
+        }
+
+
 
         [HttpGet("Login")]
         public IActionResult Login()
