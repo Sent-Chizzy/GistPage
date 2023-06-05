@@ -18,8 +18,8 @@ namespace GistPage.Areas.Admin.Controllers
         public UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, INotyfService notyfService)
         {
             _userManager = userManager;
-            _signInManager= signInManager;
-            _notification= notyfService;
+            _signInManager = signInManager;
+            _notification = notyfService;
         }
 
         [Authorize(Roles = "Admin")]
@@ -29,7 +29,7 @@ namespace GistPage.Areas.Admin.Controllers
             var users = await _userManager.Users.ToListAsync();
             var vm = users.Select(x => new UserVM()
             {
-                Id= x.Id,
+                Id = x.Id,
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 UserName = x.UserName,
@@ -38,13 +38,13 @@ namespace GistPage.Areas.Admin.Controllers
 
 
             //asigning Roles
-            foreach(var user in vm)
+            foreach (var user in vm)
             {
                 var singleUser = await _userManager.FindByIdAsync(user.Id);
                 var role = await _userManager.GetRolesAsync(singleUser);
                 user.Role = role.FirstOrDefault();
             }
-            
+
             return View(vm);
         }
 
@@ -54,15 +54,15 @@ namespace GistPage.Areas.Admin.Controllers
         public async Task<IActionResult> ResetPassword(string id)
         {
             var existingUser = await _userManager.FindByIdAsync(id);
-            if(existingUser == null)
+            if (existingUser == null)
             {
                 _notification.Error("User not found");
                 return View();
             }
             var vm = new ResetPasswordVM()
             {
-                Id = existingUser.Id,   
-                UserName= existingUser.UserName,
+                Id = existingUser.Id,
+                UserName = existingUser.UserName,
             };
             return View(vm);
         }
@@ -72,19 +72,19 @@ namespace GistPage.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordVM vm)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(vm);
             }
             var existingUser = await _userManager.FindByIdAsync(vm.Id);
-            if(existingUser == null)
+            if (existingUser == null)
             {
                 _notification.Error("User Not Found");
                 return View(vm);
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
             var result = await _userManager.ResetPasswordAsync(existingUser, token, vm.NewPassword);
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
                 _notification.Success("Password Reset Successful");
                 return RedirectToAction(nameof(Index));
@@ -107,16 +107,16 @@ namespace GistPage.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(vm);    
+                return View(vm);
             }
             var checkUserByEmail = await _userManager.FindByEmailAsync(vm.Email);
-            if(checkUserByEmail!= null)
+            if (checkUserByEmail != null)
             {
                 _notification.Error("Existing Email");
                 return View(vm);
             }
             var checkUserByUserName = await _userManager.FindByNameAsync(vm.UserName);
-            if(checkUserByUserName != null)
+            if (checkUserByUserName != null)
             {
                 _notification.Error("Existing Username");
                 return View(vm);
@@ -130,7 +130,7 @@ namespace GistPage.Areas.Admin.Controllers
             };
 
             var result = await _userManager.CreateAsync(applicationUser, vm.Password);
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
                 if (vm.IsAdmin)
                 {
@@ -156,8 +156,8 @@ namespace GistPage.Areas.Admin.Controllers
             {
                 return View(new LoginVM());
             }
-            return RedirectToAction("Index", "User", new {area ="Admin"});
-            
+            return RedirectToAction("Index", "Post", new { area = "Admin" });
+
         }
 
         [HttpPost("Login")]
@@ -168,28 +168,36 @@ namespace GistPage.Areas.Admin.Controllers
                 return View(vm);
             }
             var existingUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == vm.Username);
-            if(existingUser == null)
+            if (existingUser == null)
             {
                 _notification.Error("Username Does not exist");
                 return View(vm);
             }
             var verifyPassword = await _userManager.CheckPasswordAsync(existingUser, vm.Password);
-            if(!verifyPassword)
+            if (!verifyPassword)
             {
                 _notification.Error("Password Mismatch");
                 return View(vm);
             }
-            await _signInManager.PasswordSignInAsync(vm.Username,vm.Password, vm.RememberMe, true);
+            await _signInManager.PasswordSignInAsync(vm.Username, vm.Password, vm.RememberMe, true);
             _notification.Success("Login Successful");
-            return RedirectToAction("Index", "User", new {area = "Admin"});
+            return RedirectToAction("Index", "Post", new { area = "Admin" });
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Logout()
         {
             _signInManager.SignOutAsync();
             _notification.Success("Successfully Logged Out");
-            return RedirectToAction("Index", "Home", new {area= ""});
+            return RedirectToAction("Index", "Home", new { area = "" });
+        }
+
+        [HttpGet("AccessDenied")]
+        [Authorize]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }
