@@ -1,18 +1,47 @@
-﻿
+﻿@model List<GistPage.ViewModels.PostVM>
 
 @{
-    ViewData["Title"] = "List of Posts";
+    ViewData["Title"] = "Posts Page";
 }
 
 
 <div class="container-fluid">
-    <a class="btn btn-secondary mb-1">Create Post</a>
+    <a class="btn btn-secondary mb-1" asp-action="Create" asp-controller="Post" asp-area="Admin">Create Post</a>
     <div class="card">
         <div class="card-header bg-dark">
             <h4 class="card-title text-white">List of Posts</h4>
         </div>
-        <div class="card-body">
-            
+        <div class="card-body" style="background-color:lightgrey">
+            @foreach(var post in Model)
+            {
+                <div class="rounded mb-4 bg-white p-2" style="color:black">
+                    <div class="row">
+                        <div class="col-2 d-flex justify-content-center flex-column">
+                            @if(post.ThumbnailUrl == null)
+                            {
+                                <img class="" src="~/thumbnails/default_image.png" object-fit:fill; height:" 100px"; width:"100px">
+                            }
+                            else
+                            {
+                                <img class="" src="~/thumbnails/@post.ThumbnailUrl" style="object-fit:fill; height:" 100px"; width:"100px">
+                            }
+                        </div>
+                        <div class="col-5 d-flex justify-content-center flex-column">
+                            <h4>@post.Title</h4>
+                            <p>@post.CreatedDate</p>
+                        </div>
+                        <div class="col-5 text-right d-flex justify-content-center flex-column">
+                            <h4>@post.AuthorName</h4>
+                            <p>
+                                <a class="btn btn-warning" asp-action="Edit" asp-area="Admin" asp-controller="Post" asp-route-id="@post.Id" method="post">Edit</a> |
+                                <form asp-area="Admin" asp-controller="Post" asp-action="Delete" asp-route-id="@post.Id" method="post" onsubmit="return confirm('Proceed with Delete?')">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>

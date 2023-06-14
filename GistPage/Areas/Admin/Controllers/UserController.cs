@@ -14,8 +14,10 @@ namespace GistPage.Areas.Admin.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly INotyfService _notification;
-        public UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, INotyfService notyfService)
+        public  INotyfService _notification { get; }
+        public UserController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager, 
+            INotyfService notyfService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
