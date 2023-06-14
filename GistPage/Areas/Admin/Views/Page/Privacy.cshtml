@@ -1,19 +1,19 @@
-﻿@model GistPage.ViewModels.CreatePostVM
+﻿@model GistPage.ViewModels.PageVM
 
 @{
-    ViewData["Title"] = "Edit Post";
+    ViewData["Title"] = "Privacy Page";
 }
 
 <div class="container-fluid">
-    <a class="btn btn-secondary mb-1" asp-action="Index" asp-controller="Post">All Posts</a>
+    <a class="btn btn-secondary mb-1" asp-action="Index" asp-controller="Post">Previous Page</a>
     <div class="card">
         <div class="card-header bg-dark">
-            <h4 class="card-title text-white">Post Details</h4>
+            <h4 class="card-title text-white">Privacy Page</h4>
         </div>
         <div class="card-body">
-            <form asp-action="Edit" asp-controller="Post" asp-area="Admin" enctype="multipart/form-data">
+            <form asp-action="Privacy" asp-controller="Page" asp-area="Admin" enctype="multipart/form-data">
                 <input type="hidden" asp-for="Id" />
-                <input  type="hidden" asp-for="ThumbnailUrl"/>
+                <input type="hidden" asp-for="ThumbnailUrl" />
                 <div class="row">
                     <div class="col-9">
                         <div class="mb-2">
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     <div class="col-3">
-                       <div class="mb-2">
+                        <div class="mb-2">
                             @{
                                 if (Model.ThumbnailUrl == null)
                                 {

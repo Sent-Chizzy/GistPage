@@ -171,7 +171,6 @@ namespace GistPage.Areas.Admin.Controllers
 
             await _context.SaveChangesAsync();
             _notification.Success("Successfully Updated");
-
             return RedirectToAction("Index", "Post", new {area = "Admin"});    
         }
 

@@ -19,25 +19,25 @@
                         <div class="col-2 d-flex justify-content-center flex-column">
                             @if(post.ThumbnailUrl == null)
                             {
-                                <img class="" src="~/thumbnails/default_image.png" object-fit:fill; height:" 100px"; width:"100px">
+                                <img class="" src="~/thumbnails/default_image.png" sstyle="object-fit:fill; height:100%; width:100%">
                             }
                             else
                             {
-                                <img class="" src="~/thumbnails/@post.ThumbnailUrl" style="object-fit:fill; height:" 100px"; width:"100px">
+                                <img class="" src="~/thumbnails/@post.ThumbnailUrl" style="object-fit:fill; height:100%; width:100%">
                             }
                         </div>
                         <div class="col-5 d-flex justify-content-center flex-column">
-                            <h4>@post.Title</h4>
+                            <h4 style="font-size:2rem; font-weight:bolder;">@post.Title</h4>
                             <p>@post.CreatedDate</p>
                         </div>
                         <div class="col-5 text-right d-flex justify-content-center flex-column">
-                            <h4>@post.AuthorName</h4>
-                            <p>
-                                <a class="btn btn-warning" asp-action="Edit" asp-area="Admin" asp-controller="Post" asp-route-id="@post.Id" method="post">Edit</a> |
-                                <form asp-area="Admin" asp-controller="Post" asp-action="Delete" asp-route-id="@post.Id" method="post" onsubmit="return confirm('Proceed with Delete?')">
+                            <h4 class="mr-3">@post.AuthorName</h4>
+                            <div class="d-flex justify-content-end align-items-center">
+                                <a class="btn btn-warning mr-2" asp-action="Edit" asp-area="Admin" asp-controller="Post" asp-route-id="@post.Id" method="post">Edit</a> 
+                                <form asp-area="Admin" asp-controller="Post" asp-action="Delete" asp-route-id="@post.Id" method="post" onsubmit="return confirm('Proceed wit Delete?')">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>

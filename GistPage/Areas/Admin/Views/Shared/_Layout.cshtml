@@ -81,9 +81,9 @@
                      data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <h6 class="collapse-header">Custom Utilities:</h6>
-                            <a class="collapse-item" href="utilities-color.html">About Us</a>
-                            <a class="collapse-item" href="utilities-border.html">Contact us</a>
-                            <a class="collapse-item" href="utilities-animation.html">Privacy Policy</a>
+                            <a class="collapse-item" asp-area="Admin" asp-controller="Page" asp-action="About">About Us</a>
+                            <a class="collapse-item" asp-area="Admin" asp-controller="Page" asp-action="Contact">Contact us</a>
+                            <a class="collapse-item" asp-area="Admin" asp-controller="Page" asp-action="Privacy">Privacy Policy</a>
                         </div>
                     </div>
                 </li>
@@ -192,9 +192,22 @@
     <script src="~/dashboard/js/demo/chart-area-demo.js"></script>
     <script src="~/dashboard/js/demo/chart-pie-demo.js"></script><script src="~/dashboard/js/demo/chart-pie-demo.js"></script>
     <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/damibl40c0bcbncq45ih1x5cz3b84v35unspyqkc9t37i9r3/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         $(document).ready(function () {
             $('#myTable').DataTable();
+        });
+
+        tinymce.init({
+            selector: '#richEditor',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' },
+            ]
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
