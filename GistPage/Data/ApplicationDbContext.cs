@@ -12,6 +12,8 @@ namespace GistPage.Data
         }
         public DbSet<ApplicationUser>? ApplicationUsers { get; set; }   
         public DbSet<Post>? Posts { get; set; }
-        public DbSet<Page> Pages { get; set; }
+        public DbSet<Page>? Pages { get; set; }
+        public DbSet<Setting>? Settings { get; set; }
+
     }
 }
