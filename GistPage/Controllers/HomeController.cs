@@ -1,21 +1,37 @@
-﻿using GistPage.Models;
+﻿using GistPage.Data;
+using GistPage.Models;
+using GistPage.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using X.PagedList;
 
 namespace GistPage.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, 
+                                ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int? page)
         {
-            return View();
+            var vm = new HomeVm();
+            var setting = _context.Settings!.ToList();
+            vm.Title = setting[0].SiteName;
+            vm.ShortDescription = setting[0].ShortDescription;
+            vm.ThumbnailUrl= setting[0].ThumbnailUrl;
+            int pageSize = 4;
+            int pageNumber = (page ?? 1);
+            vm.Posts = await _context.Posts!.Include(x => x.ApplicationUser).ToPagedListAsync(pageNumber, pageSize);
+
+            return View(vm);
         }
 
         public IActionResult Privacy()
